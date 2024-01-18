@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/project2.dir/main.cpp.o -o project2  -lGL -lglut -lGLEW 
