@@ -4,16 +4,55 @@
 #include "cyTriMesh.h"
 #include "cyMatrix.h"
 #include "cyGL.h"
+#include <iostream>
 
 using namespace std;
 
 int num_vertices;
 GLuint VAO;
+float rot_x = -90.0f;
+float rot_y = 0.0f;
+float camera_distance = 50.0f;
+float lastX = 400, lastY = 300;
+cy::GLSLProgram prog;
+bool leftButtonPressed = false;
+cy::TriMesh mesh;
+bool orthogonal_projection_on = false;
 
+cy::Matrix4f getOrthographicMatrix(float left, float right, float bottom, float top, float near, float far) {
+        cy::Matrix4f proj = cy::Matrix4f(2.0f / (right - left), 0, 0, -(right + left) / (right - left),
+        0, 2.0f / (top - bottom), 0, -(top + bottom) / (top - bottom),
+        0, 0, -2.0f / (far - near),  -(far + near) / (far - near),
+        0, 0, 0, 1);
+
+        return proj;
+}
 
 void display() {
-    // Your rendering code goes here
+    // set uniforms
+    cy::Matrix4f mvpMatrix = cy::Matrix4f(1.0);
+    
+     // Calculate the bounding box
+    mesh.ComputeBoundingBox();
+    cy::Vec3f center = (mesh.GetBoundMin() + mesh.GetBoundMax()) * 0.5f;
 
+    //add two rotations to model matrix
+    cy::Matrix4f model = cy::Matrix4f::RotationX(rot_x * 3.14 /180.0) * cy::Matrix4f::RotationY(rot_y * 3.14 /180.0);
+    // Adjust the model transformation matrix to center the object
+    model *= cy::Matrix4f::Translation(-center); 
+    
+    cy::Matrix4f view = cy::Matrix4f::Translation(cy::Vec3f(0.0f, 0.0f, -camera_distance));
+    cy::Matrix4f proj = cy::Matrix4f(1.0);
+    if (!orthogonal_projection_on) {
+        proj *= cy::Matrix4f::Perspective(40 * 3.14 /180.0, 800.0/600.0, 0.1f, 1000.0f);
+    } else {
+        float scale_factor = 500.0f/camera_distance;
+        proj*= getOrthographicMatrix(-scale_factor, scale_factor, -scale_factor, scale_factor, 0.1f, 1500.0f);
+    }
+    mvpMatrix = proj * view * model * mvpMatrix;
+    prog["mvp"] = mvpMatrix;
+
+    // Your rendering code goes here
     glClear(GL_COLOR_BUFFER_BIT);
     // Draw your graphics here
     glBindVertexArray(VAO);
@@ -25,7 +64,56 @@ void display() {
 void keyboard(unsigned char key, int x, int y) {
     if (key == 27) {  // ASCII value for the Esc key
         glutLeaveMainLoop();
+    } else if (key == 'P' || key == 'p') {
+        orthogonal_projection_on = !orthogonal_projection_on;
+        if (orthogonal_projection_on) {
+            cout << "Switched to orthogonal projection." << endl;
+        } else {
+            cout << "Switched to perspective projection." << endl;
+        }
+        glutPostRedisplay();
     }
+}
+
+void specialKeyboard(int key, int x, int y) {
+    switch (key) {
+        case GLUT_KEY_F6:
+            // Reload shaders when F6 key is pressed
+            prog.BuildFiles("vs.txt", "fs.txt");
+            prog.Bind();
+            cout << "Shaders recompiled successfully." << endl;
+            glutPostRedisplay();
+            break;
+    }
+}
+
+void handleMouse(int button, int state, int x, int y) {
+    if (button == GLUT_LEFT_BUTTON) {
+        leftButtonPressed = (state == GLUT_DOWN);
+    }
+
+    // Update last mouse position
+    lastX = x;
+    lastY = y;
+}
+
+void mouseMotion(int x, int y) {
+    float xoffset = x - lastX;
+    float yoffset = lastY - y; // reversed since y-coordinates range from bottom to top
+    lastX = x;
+    lastY = y;
+
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+    if (leftButtonPressed) {
+        rot_x +=yoffset;
+        rot_y +=xoffset;
+    } else {
+        camera_distance -= yoffset;
+    }
+
+    glutPostRedisplay();
 }
 
 void idle() {
@@ -87,13 +175,12 @@ int main(int argc, char** argv) {
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
     glutIdleFunc(idle);
-
-
-
+    glutMouseFunc(handleMouse);
+    glutMotionFunc(mouseMotion);
+    glutSpecialFunc(specialKeyboard);
 
 
     // load model
-    cy::TriMesh mesh;
     loadModel(argc, argv, mesh);
 
     // set up VAO and VBO
@@ -110,12 +197,7 @@ int main(int argc, char** argv) {
 
 
     // link shaders
-    cy::GLSLProgram prog;
     prog.BuildFiles("vs.txt", "fs.txt");
-
-    // set uniforms
-    cy::Matrix4f mvpMatrix = cy::Matrix4f(0.05);
-    prog["mvp"] = mvpMatrix;
     prog.Bind();
 
 
