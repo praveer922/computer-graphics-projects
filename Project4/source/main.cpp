@@ -11,12 +11,9 @@
 
 using namespace std;
 
-float light_rot_y = 0.0f;
-float light_rot_z = 0.0f;
 float lastX = 400, lastY = 300;
 bool leftButtonPressed = false;
 bool controlKeyPressed = false;
-cy::Vec3f lightPosLocalSpace = cy::Vec3f(15.0, -15.0, 15.0);
 Camera camera;
 Object* modelObj;
 CubeObject* lightCubeObj;
