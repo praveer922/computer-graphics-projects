@@ -73,7 +73,6 @@ void display() {
     modelObj->prog["model"] = modelObj->modelMatrix;
     modelObj->prog["view"] = view;
     modelObj->prog["projection"] = proj;
-    modelObj->prog["normalTransform"] = (view*modelObj->modelMatrix).GetSubMatrix3();
     modelObj->prog["lightWorldSpacePos"] = lightCubeObj->worldSpacePos;
     glBindVertexArray(modelObj->VAO);
     glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);

@@ -1,6 +1,6 @@
 #version 330 core
 
-in vec3 fragNormal;
+in vec3 normalViewPos;
 in vec3 fragPos;
 in vec3 lightViewPos;
 layout(location=0) out vec4 color;
@@ -15,7 +15,7 @@ void main() {
     vec3 ambient = ambientStrength * lightColor;
 
     // diffuse light 
-    vec3 normalizedNormal = normalize(fragNormal);
+    vec3 normalizedNormal = normalize(normalViewPos);
     vec3 lightDir = normalize(lightViewPos - fragPos);
     float diff = max(dot(normalizedNormal, lightDir), 0.0);
     vec3 diffuse = diff * objectColor;
