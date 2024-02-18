@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/project4.dir/includes/lodepng.cpp.o"
+  "CMakeFiles/project4.dir/includes/lodepng.cpp.o.d"
   "CMakeFiles/project4.dir/main.cpp.o"
   "CMakeFiles/project4.dir/main.cpp.o.d"
   "project4"

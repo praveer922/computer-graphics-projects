@@ -2,6 +2,7 @@
 
 layout(location=0) in vec3 pos;
 layout(location=1) in vec3 inNormal;
+layout(location = 2) in vec2 aTexCoord; // Texture coordinate attribute
 
 uniform mat4 model;
 uniform mat4 view;
@@ -11,10 +12,12 @@ uniform vec3 lightWorldSpacePos;
 out vec3 normalViewPos;
 out vec3 fragPos;
 out vec3 lightViewPos;
+out vec2 TexCoords;
 
 void main() {
     gl_Position = projection * view * model * vec4(pos, 1);
     normalViewPos = mat3(transpose(inverse(view * model))) * inNormal;
     fragPos = vec3(view * model * vec4(pos,1));
     lightViewPos = vec3(view * vec4(lightWorldSpacePos,1));
+    TexCoords = aTexCoord;
 }

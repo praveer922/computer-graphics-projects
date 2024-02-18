@@ -129,6 +129,30 @@ project4/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/project4.dir/build.make CMakeFiles/project4.dir/build
 .PHONY : project4/fast
 
+includes/lodepng.o: includes/lodepng.cpp.o
+.PHONY : includes/lodepng.o
+
+# target to build an object file
+includes/lodepng.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project4.dir/build.make CMakeFiles/project4.dir/includes/lodepng.cpp.o
+.PHONY : includes/lodepng.cpp.o
+
+includes/lodepng.i: includes/lodepng.cpp.i
+.PHONY : includes/lodepng.i
+
+# target to preprocess a source file
+includes/lodepng.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project4.dir/build.make CMakeFiles/project4.dir/includes/lodepng.cpp.i
+.PHONY : includes/lodepng.cpp.i
+
+includes/lodepng.s: includes/lodepng.cpp.s
+.PHONY : includes/lodepng.s
+
+# target to generate assembly for a file
+includes/lodepng.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/project4.dir/build.make CMakeFiles/project4.dir/includes/lodepng.cpp.s
+.PHONY : includes/lodepng.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -162,6 +186,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... project4"
+	@echo "... includes/lodepng.o"
+	@echo "... includes/lodepng.i"
+	@echo "... includes/lodepng.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

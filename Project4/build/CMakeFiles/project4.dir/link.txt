@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/project4.dir/main.cpp.o -o project4  -lGL -lglut -lGLEW 
+/usr/bin/c++ CMakeFiles/project4.dir/main.cpp.o CMakeFiles/project4.dir/includes/lodepng.cpp.o -o project4  -lGL -lglut -lGLEW 

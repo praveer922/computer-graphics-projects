@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/includes/lodepng.cpp" "CMakeFiles/project4.dir/includes/lodepng.cpp.o" "gcc" "CMakeFiles/project4.dir/includes/lodepng.cpp.o.d"
   "/mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/main.cpp" "CMakeFiles/project4.dir/main.cpp.o" "gcc" "CMakeFiles/project4.dir/main.cpp.o.d"
   )
 

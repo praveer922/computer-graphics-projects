@@ -281,6 +281,7 @@ CMakeFiles/project4.dir/main.cpp.o: \
  /usr/include/X11/Xutil.h /usr/include/X11/keysym.h \
  /usr/include/X11/keysymdef.h /usr/include/GL/glxext.h \
  /usr/include/inttypes.h \
+ /mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/includes/lodepng.h \
  /mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/Camera.h \
  /mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/Util.h \
  /mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/Object.h \

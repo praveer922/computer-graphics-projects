@@ -2,7 +2,7 @@
 project(project4)
 
 
-set(SOURCES main.cpp)
+set(SOURCES main.cpp includes/lodepng.cpp)
 add_executable(project4 ${SOURCES})
 
 target_link_libraries(project4 GL)
