@@ -504,12 +504,69 @@ CMakeFiles/project4.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/CompGraphi
   /mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/Camera.h \
   /mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/Util.h \
   /mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/Object.h \
+  /mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/Init.h \
+  /usr/include/c++/11/memory \
+  /usr/include/c++/11/bits/stl_tempbuf.h \
+  /usr/include/c++/11/bits/stl_raw_storage_iter.h \
+  /usr/include/c++/11/bits/align.h \
+  /usr/include/c++/11/bit \
+  /usr/include/c++/11/bits/uses_allocator.h \
+  /usr/include/c++/11/bits/unique_ptr.h \
+  /usr/include/c++/11/utility \
+  /usr/include/c++/11/bits/stl_relops.h \
+  /usr/include/c++/11/tuple \
+  /usr/include/c++/11/array \
+  /usr/include/c++/11/bits/invoke.h \
+  /usr/include/c++/11/bits/shared_ptr.h \
+  /usr/include/c++/11/bits/shared_ptr_base.h \
+  /usr/include/c++/11/bits/allocated_ptr.h \
+  /usr/include/c++/11/bits/refwrap.h \
+  /usr/include/c++/11/ext/aligned_buffer.h \
+  /usr/include/c++/11/ext/concurrence.h \
+  /usr/include/c++/11/bits/shared_ptr_atomic.h \
+  /usr/include/c++/11/bits/atomic_base.h \
+  /usr/include/c++/11/bits/atomic_lockfree_defines.h \
+  /usr/include/c++/11/backward/auto_ptr.h \
+  /usr/include/c++/11/pstl/glue_memory_defs.h \
+  /usr/include/c++/11/pstl/execution_defs.h \
   /mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/PredefinedModels.h
 
 
 /mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/PredefinedModels.h:
 
+/usr/include/c++/11/pstl/glue_memory_defs.h:
+
+/usr/include/c++/11/bits/atomic_lockfree_defines.h:
+
+/usr/include/c++/11/bits/atomic_base.h:
+
+/usr/include/c++/11/bits/shared_ptr_atomic.h:
+
+/usr/include/c++/11/ext/concurrence.h:
+
+/usr/include/c++/11/bits/refwrap.h:
+
+/usr/include/c++/11/bits/allocated_ptr.h:
+
+/usr/include/c++/11/bits/invoke.h:
+
+/usr/include/c++/11/tuple:
+
+/usr/include/c++/11/bits/uses_allocator.h:
+
+/usr/include/c++/11/bit:
+
+/usr/include/c++/11/bits/align.h:
+
+/usr/include/c++/11/bits/stl_raw_storage_iter.h:
+
+/usr/include/c++/11/bits/stl_tempbuf.h:
+
+/usr/include/c++/11/memory:
+
 /mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/Object.h:
+
+/usr/include/c++/11/bits/unique_ptr.h:
 
 /mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/Camera.h:
 
@@ -544,6 +601,8 @@ CMakeFiles/project4.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/CompGraphi
 /usr/lib/gcc/x86_64-linux-gnu/11/include/amxbf16intrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/amxtileintrin.h:
+
+/usr/include/c++/11/backward/auto_ptr.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512bf16intrin.h:
 
@@ -606,6 +665,8 @@ CMakeFiles/project4.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/CompGraphi
 /usr/lib/gcc/x86_64-linux-gnu/11/include/emmintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/hresetintrin.h:
+
+/usr/include/c++/11/pstl/execution_defs.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/xsavesintrin.h:
 
@@ -819,6 +880,8 @@ CMakeFiles/project4.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/CompGraphi
 
 /usr/include/c++/11/tr1/poly_laguerre.tcc:
 
+/usr/include/c++/11/bits/shared_ptr.h:
+
 /usr/include/c++/11/bits/stl_construct.h:
 
 /usr/include/c++/11/tr1/exp_integral.tcc:
@@ -874,6 +937,8 @@ CMakeFiles/project4.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/CompGraphi
 /usr/include/c++/11/bits/alloc_traits.h:
 
 /usr/include/c++/11/bits/functional_hash.h:
+
+/usr/include/c++/11/bits/shared_ptr_base.h:
 
 /usr/include/c++/11/bits/basic_string.h:
 
@@ -967,6 +1032,8 @@ CMakeFiles/project4.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/CompGraphi
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/fxsrintrin.h:
 
+/usr/include/c++/11/ext/aligned_buffer.h:
+
 /usr/include/x86_64-linux-gnu/sys/types.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/clflushoptintrin.h:
@@ -1045,6 +1112,8 @@ CMakeFiles/project4.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/CompGraphi
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/popcntintrin.h:
 
+/usr/include/c++/11/bits/stl_relops.h:
+
 /usr/include/limits.h:
 
 /usr/include/c++/11/bits/istream.tcc:
@@ -1056,6 +1125,8 @@ CMakeFiles/project4.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/CompGraphi
 /usr/lib/gcc/x86_64-linux-gnu/11/include/bmi2intrin.h:
 
 /usr/include/GL/freeglut.h:
+
+/usr/include/c++/11/utility:
 
 /usr/include/c++/11/ios:
 
@@ -1094,6 +1165,8 @@ CMakeFiles/project4.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/CompGraphi
 /usr/include/x86_64-linux-gnu/bits/fp-fast.h:
 
 /usr/include/c++/11/stdexcept:
+
+/mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project4/source/Init.h:
 
 /usr/include/string.h:
 
@@ -1162,6 +1235,8 @@ CMakeFiles/project4.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/CompGraphi
 /usr/include/c++/11/bits/specfun.h:
 
 /usr/include/c++/11/limits:
+
+/usr/include/c++/11/array:
 
 /usr/include/c++/11/tr1/beta_function.tcc:
 

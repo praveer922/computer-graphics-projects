@@ -48,8 +48,6 @@ public:
     }
 
     void storeAllVertices() {
-
-
         positions = std::vector<cy::Vec3f>(mesh.NV());
         normals = std::vector<cy::Vec3f>(mesh.NV());
         texCoords = std::vector<cy::Vec3f>(mesh.NV());

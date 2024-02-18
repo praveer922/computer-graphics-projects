@@ -7,62 +7,15 @@
 #include "includes/lodepng.h"
 #include "Camera.h"
 #include "Object.h"
-#include "PredefinedModels.h"
+#include "Init.h"
+#include <memory>
 #include <iostream>
 
 using namespace std;
 
-float lastX = 400, lastY = 300;
-bool leftButtonPressed = false;
-bool controlKeyPressed = false;
 Camera camera;
-Object* modelObj;
-LightCubeObject* lightCubeObj;
-GLuint teapotTexture;
-
-void keyboard(unsigned char key, int x, int y) {
-    if (key == 27) {  // ASCII value for the Esc key
-        glutLeaveMainLoop();
-    } else {
-        camera.processKeyboard(key, x, y);
-    }
-    glutPostRedisplay();
-}
-
-
-void specialKeyboardUp(int key, int x, int y) {
-    switch (key) {
-        case GLUT_KEY_CTRL_L:
-        case GLUT_KEY_CTRL_R:
-            controlKeyPressed = false;
-            break;
-    }
-}
-
-void handleMouse(int button, int state, int x, int y) {
-    if (button == GLUT_LEFT_BUTTON) {
-        leftButtonPressed = (state == GLUT_DOWN);
-    }
-
-    // Update last mouse position
-    lastX = x;
-    lastY = y;
-}
-
-void mouseMotion(int x, int y) {
-    float xoffset = x - lastX;
-    float yoffset = lastY - y; // reversed since y-coordinates range from bottom to top
-    lastX = x;
-    lastY = y;
-
-    if (controlKeyPressed) {
-        lightCubeObj->processMouseMovement(xoffset, yoffset, leftButtonPressed);
-    } else {
-        camera.processMouseMovement(xoffset, yoffset, leftButtonPressed);
-    }
-
-    glutPostRedisplay();
-}
+shared_ptr<Object> modelObj;
+shared_ptr<LightCubeObject> lightCubeObj;
 
 void display() { 
     cy::Matrix4f view = camera.getLookAtMatrix();
@@ -88,22 +41,6 @@ void display() {
     glutSwapBuffers();
 }
 
-void specialKeyboard(int key, int x, int y) {
-    switch (key) {
-        case GLUT_KEY_F6:
-            // Reload shaders when F6 key is pressed
-            modelObj->prog.BuildFiles("vs.txt", "fs.txt");
-            modelObj->prog.Bind();
-            cout << "Shaders recompiled successfully." << endl;
-            glutPostRedisplay();
-            break;
-        case GLUT_KEY_CTRL_L:
-        case GLUT_KEY_CTRL_R:
-            controlKeyPressed = true;
-            break;
-    }
-}
-
 void processInputModel(int argc, char** argv) {
     char * modelName;
 
@@ -122,42 +59,17 @@ void processInputModel(int argc, char** argv) {
 
 
 int main(int argc, char** argv) {
-    // Initialize GLUT
-    glutInit(&argc, argv);
 
-    // Set OpenGL version and profile
-    glutInitContextVersion(3, 3);
-    glutInitContextProfile(GLUT_CORE_PROFILE);
+    Init::initGL("Project4", argc, argv);
+    Init::setCallbacks(display);
 
-    // Set up a double-buffered window with RGBA color
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-
-    // some default settings
-    glutInitWindowSize(800, 600);
-    glutInitWindowPosition(100, 100);
-
-
-    // Create a window with a title
-    glutCreateWindow("Project 4");
-
-    // Initialize GLEW
-    glewInit();
-    glEnable(GL_DEPTH_TEST);  
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-    // Set up callbacks
-    glutDisplayFunc(display);
-    glutKeyboardFunc(keyboard);
-    glutSpecialFunc(specialKeyboard);
-    glutSpecialUpFunc(specialKeyboardUp);
-    glutMouseFunc(handleMouse);
-    glutMotionFunc(mouseMotion);
-
-    // create a model object with vs and fs shaders
-    modelObj = new Object("vs.txt", "fs.txt");
-    processInputModel(argc, argv);
+    // create models/objects
+    Init::processInputModel(argc, argv, modelObj);
     // the teapot model is top down so let's rotate it 90 degrees
     modelObj->modelMatrix = cy::Matrix4f::RotationX(Util::degreesToRadians(-90)) * modelObj->modelMatrix;
+    Init::createLightCube(lightCubeObj);
+
+    Init::initCamera(&camera);
 
     // set up VAO and VBO and EBO and NBO
     glGenVertexArrays(1, &(modelObj->VAO)); 
@@ -191,6 +103,7 @@ int main(int argc, char** argv) {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(cy::Vec3f), (void*)0);
 
     // teapot texture
+    GLuint teapotTexture;
     glGenTextures(1, &teapotTexture);  
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, teapotTexture);  
@@ -220,7 +133,7 @@ int main(int argc, char** argv) {
 
 
     // load specular texture
-    unsigned int specularTexture;
+    GLuint specularTexture;
     glGenTextures(1, &specularTexture);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, specularTexture);
@@ -243,9 +156,7 @@ int main(int argc, char** argv) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-
-    // create lightcube object at (15,15,15) with color (1,1,1)
-    lightCubeObj = new LightCubeObject(&PredefinedModels::lightCubeVertices, cy::Vec3f(15.0, 15.0, 15.0), cy::Vec3f(1.0f,1.0f,1.0f), "lightcube_vs.txt", "lightcube_fs.txt");
+    // set up light cube
 
     glGenVertexArrays(1, &(lightCubeObj->VAO)); 
     glBindVertexArray(lightCubeObj->VAO);
@@ -256,10 +167,6 @@ int main(int argc, char** argv) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * lightCubeObj->vertices->size(), lightCubeObj->vertices->data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    // initialize camera
-    camera.setOrthographicMatrix(0.1f, 1500.0f, 500.0f);
-    camera.setPerspectiveMatrix(65,800.0f/600.0f, 2.0f, 1000.0f);
 
 
     // Enter the GLUT event loop
