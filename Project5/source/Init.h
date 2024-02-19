@@ -43,7 +43,7 @@ namespace Init {
 
     }
 
-    void processInputModel(int argc, char** argv, shared_ptr<Object> &modelObj) {
+    void initModel(int argc, char** argv, shared_ptr<Object> &modelObj) {
         char * modelName;
 
         // load model
@@ -59,14 +59,113 @@ namespace Init {
         modelObj = make_shared<Object>("vs.txt", "fs.txt");
         modelObj->loadModel(modelName);
         modelObjPtr = modelObj;
+
+        // the teapot model is top down so let's rotate it 90 degrees
+        modelObjPtr->modelMatrix = cy::Matrix4f::RotationX(Util::degreesToRadians(-90)) * modelObjPtr->modelMatrix;
+
+        // set up VAO and VBO and EBO and NBO
+        glGenVertexArrays(1, &(modelObjPtr->VAO)); 
+        glBindVertexArray(modelObjPtr->VAO);
+
+        GLuint VBO;
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(cy::Vec3f)*modelObjPtr->positions.size(), modelObjPtr->positions.data(), GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+        GLuint EBO;
+        glGenBuffers(1, &EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * modelObjPtr->mesh.NF() * 3, &modelObjPtr->mesh.F(0), GL_STATIC_DRAW);
+
+        GLuint normalVBO;
+        glGenBuffers(1, &normalVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(cy::Vec3f) * modelObjPtr->normals.size(), modelObjPtr->normals.data(), GL_STATIC_DRAW);
+        glEnableVertexAttribArray(1); // Assuming attribute index 1 for normals
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+        // texture stuff 
+        GLuint texCoordVBO;
+        glGenBuffers(1, &texCoordVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, texCoordVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(cy::Vec3f) * modelObjPtr->texCoords.size(), modelObjPtr->texCoords.data(), GL_STATIC_DRAW);
+        glEnableVertexAttribArray(2); // Assuming attribute index 2 for texture coords
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(cy::Vec3f), (void*)0);
+
+        // teapot texture
+        GLuint teapotTexture;
+        glGenTextures(1, &teapotTexture);  
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, teapotTexture);  
+        modelObjPtr->prog["ambientMap"] = 0;
+        modelObjPtr->prog["diffuseMap"] = 0; 
+        modelObjPtr->prog["materialAmbient"] = cy::Vec3f(modelObjPtr->mesh.M(0).Ka[0], modelObjPtr->mesh.M(0).Ka[1], modelObjPtr->mesh.M(0).Ka[2]);
+        modelObjPtr->prog["materialDiffuse"] = cy::Vec3f(modelObjPtr->mesh.M(0).Kd[0], modelObjPtr->mesh.M(0).Kd[1], modelObjPtr->mesh.M(0).Kd[2]);
+        modelObjPtr->prog["materialSpecular"] = cy::Vec3f(modelObjPtr->mesh.M(0).Ks[0], modelObjPtr->mesh.M(0).Ks[1], modelObjPtr->mesh.M(0).Ks[2]);
+        modelObjPtr->prog["materialShininess"] = modelObjPtr->mesh.M(0).Ns;
+
+        std::vector<unsigned char> image; // The raw pixels
+        unsigned width, height;
+
+        // Decode the image
+        unsigned error = lodepng::decode(image, width, height, modelObjPtr->mesh.M(0).map_Kd.data);
+        if (error) {
+            std::cerr << "Error loading texture: " << lodepng_error_text(error) << std::endl;
+            return;
+        } else {
+            std::cout << "Diffuse texture map loaded successfully." << std::endl;
+        }
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+        // load specular texture
+        GLuint specularTexture;
+        glGenTextures(1, &specularTexture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularTexture);
+        modelObjPtr->prog["specularMap"] = 1; // set to texture 1
+
+        std::vector<unsigned char> specular_image; // The raw pixels
+        unsigned spec_w, spec_h;
+
+        // Decode the image
+        unsigned error_spec = lodepng::decode(specular_image, spec_w, spec_h, modelObjPtr->mesh.M(0).map_Ks.data);
+        if (error) {
+            std::cerr << "Error loading texture: " << lodepng_error_text(error_spec) << std::endl;
+            return;
+        } else {
+            std::cout << "Specular texture map loaded successfully." << std::endl;
+        }
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, spec_w, spec_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, &specular_image[0]);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
-    void createLightCube(shared_ptr<LightCubeObject> &lightCubeObj) {
+    void initLightCube(shared_ptr<LightCubeObject> &lightCubeObj) {
         // create lightcube object at (15,15,15) with color (1,1,1)
         lightCubeObj = make_shared<LightCubeObject>(&PredefinedModels::lightCubeVertices, 
                                                     cy::Vec3f(15.0, 15.0, 15.0), cy::Vec3f(1.0f,1.0f,1.0f), 
                                                     "lightcube_vs.txt", "lightcube_fs.txt");
         lightCubeObjPtr = lightCubeObj;
+
+        // set up light cube
+        glGenVertexArrays(1, &(lightCubeObjPtr->VAO)); 
+        glBindVertexArray(lightCubeObjPtr->VAO);
+
+        GLuint lightCubeVBO;
+        glGenBuffers(1, &lightCubeVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * lightCubeObjPtr->vertices->size(), lightCubeObjPtr->vertices->data(), GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
     void specialKeyboard(int key, int x, int y) {
