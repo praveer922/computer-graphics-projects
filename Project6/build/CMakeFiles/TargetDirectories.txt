@@ -1,0 +1,3 @@
+/mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project6/build/CMakeFiles/project6.dir
+/mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project6/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/tewar/Documents/Utah/CompGraphics/Project6/build/CMakeFiles/rebuild_cache.dir
