@@ -1,11 +1,31 @@
 #version 330 core
 out vec4 FragColor;
 
-in vec2 TexCoords;
+in vec4 clipSpacePos;
+in vec3 worldSpacePos;
 
 uniform sampler2D renderedTexture;
+uniform vec3 cameraWorldSpacePos;
+uniform samplerCube skybox;
+uniform float envLightIntensity;
 
 void main()
 {    
-    FragColor = texture(renderedTexture, TexCoords);
+    // sample rendered texture for teapot reflection
+    vec2 ndc = (clipSpacePos.xy/clipSpacePos.w)/2.0 + 0.5;
+    vec2 TexCoords = ndc;
+    vec4 teapotReflectionColor = texture(renderedTexture, TexCoords) * envLightIntensity;
+
+
+    // environment light
+    vec3 normalPos = vec3(0,1.0,0); //just set all normals to be straight up
+    vec3 I = normalize(worldSpacePos - cameraWorldSpacePos);
+    vec3 R = reflect(I, normalize(normalPos));
+    vec4 envLight = vec4(texture(skybox, R).rgb * envLightIntensity, 1.0);
+
+    if (teapotReflectionColor.a == 0.0) {
+        FragColor = envLight;
+    } else {
+        FragColor = teapotReflectionColor;
+    }
 }

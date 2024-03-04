@@ -16,14 +16,16 @@ using namespace std;
 Camera camera;
 shared_ptr<Object> modelObj;
 shared_ptr<LightCubeObject> cubeMapObj;
+shared_ptr<PlaneObject> planeObj;
+cy::GLRenderTexture2D renderBuffer;
 
 void display() { 
     cy::Matrix4f view = camera.getLookAtMatrix();
     cy::Matrix4f proj = camera.getProjectionMatrix();
 
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // draw cubemap
+    // draw  inverted cubemap
     glDepthMask(GL_FALSE);
     cubeMapObj->prog.Bind();
     cubeMapObj->prog["model"] = cy::Matrix4f::Translation(camera.getPosition());
@@ -32,14 +34,41 @@ void display() {
     glBindVertexArray(cubeMapObj->VAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glDepthMask(GL_TRUE);
-    // draw model
+
+    // render inverted teapot to framebuffer
+    renderBuffer.Bind();
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    modelObj->prog.Bind();
+    modelObj->prog["model"] = cy::Matrix4f::Translation(cy::Vec3f(0.0f,-16.0f,0.0f)) * cy::Matrix4f::Scale(1.0,-1.0,1.0,1.0) * modelObj->modelMatrix;
+    modelObj->prog["view"] = view;
+    modelObj->prog["projection"] = proj;
+    modelObj->prog["cameraWorldSpacePos"] = camera.getPosition();
+    modelObj->prog["isReflection"] = true;
+    glBindVertexArray(modelObj->VAO);
+    glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+    renderBuffer.Unbind();
+    renderBuffer.BuildTextureMipmaps();
+
+    // draw actual teapot
     modelObj->prog.Bind();
     modelObj->prog["model"] = modelObj->modelMatrix;
     modelObj->prog["view"] = view;
     modelObj->prog["projection"] = proj;
     modelObj->prog["cameraWorldSpacePos"] = camera.getPosition();
+    modelObj->prog["isReflection"] = false;
     glBindVertexArray(modelObj->VAO);
     glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+
+    // draw the plane
+    planeObj->prog.Bind();
+    planeObj->prog["model"] = planeObj->modelMatrix;
+    planeObj->prog["view"] = camera.getLookAtMatrix();
+    planeObj->prog["projection"] = camera.getProjectionMatrix();
+    planeObj->prog["cameraWorldSpacePos"] = camera.getPosition();
+    glBindVertexArray(planeObj->VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);  
+
     glutSwapBuffers();
 }
 
@@ -69,14 +98,42 @@ int main(int argc, char** argv) {
 
 
     cubeMapObj->prog["skybox"] = 0;
-
-
-
     Init::initCubeMap({"cubemap/cubemap_posx.png", "cubemap/cubemap_negx.png",
     "cubemap/cubemap_posy.png", "cubemap/cubemap_negy.png",
     "cubemap/cubemap_posz.png", "cubemap/cubemap_negz.png", });
 
     Init::initCamera(&camera);
+
+    // set up plane
+    planeObj = make_shared<PlaneObject>(&PredefinedModels::planeVertices, cy::Vec3f(0,0,0), "plane_vs.txt", "plane_fs.txt");
+    // also scale it to be bigger
+    planeObj->modelMatrix = cy::Matrix4f::Scale(5.5) * planeObj->modelMatrix;
+
+    glGenVertexArrays(1, &(planeObj->VAO)); 
+    glBindVertexArray(planeObj->VAO);
+
+    GLuint planeVBO;
+    glGenBuffers(1, &planeVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * planeObj->vertices->size(), planeObj->vertices->data(), GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    
+    planeObj->prog["renderedTexture"] = 1;
+    planeObj->prog["skybox"] = 0;
+    planeObj->prog["envLightIntensity"] = 0.75f;
+
+     // set up render buffer  that we will render the reflection of the teapot to
+    glActiveTexture(GL_TEXTURE1);
+    renderBuffer.Initialize(true, 4, 800, 600);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Mip-mapping 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Bilinear filtering for magnification
+    GLfloat maxAnisotropy;
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+
 
 
     // Enter the GLUT event loop

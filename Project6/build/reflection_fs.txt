@@ -19,13 +19,18 @@ uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform float envLightIntensity;
 
+uniform bool isReflection;
+
 // all of this is done in world space 
 
 void main()
-{           
+{    
     // environment light
     vec3 I = normalize(worldSpacePos - cameraWorldSpacePos);
     vec3 R = reflect(I, normalize(normalPos));
+    if (isReflection) {
+        R = vec3(R.x, 1.0-R.y-0.7,R.z);
+    }
     vec4 envLight = vec4(texture(skybox, R).rgb * envLightIntensity, 1.0);
     
 

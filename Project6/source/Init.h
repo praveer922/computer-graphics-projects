@@ -26,7 +26,7 @@ namespace Init {
         glutInitContextProfile(GLUT_CORE_PROFILE);
 
         // Set up a double-buffered window with RGBA color
-        glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+        glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ALPHA);
 
         // some default settings
         glutInitWindowSize(800, 600);
@@ -39,7 +39,8 @@ namespace Init {
         // Initialize GLEW
         glewInit();
         glEnable(GL_DEPTH_TEST);  
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glEnable(GL_BLEND);
 
     }
 
