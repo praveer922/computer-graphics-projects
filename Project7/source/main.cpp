@@ -23,7 +23,7 @@ void display() {
     cy::Matrix4f view = camera.getLookAtMatrix();
     cy::Matrix4f proj = camera.getProjectionMatrix();
 
-    glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // draw actual teapot
@@ -50,7 +50,7 @@ void display() {
     planeObj->prog["view"] = view;
     planeObj->prog["projection"] = proj;
     planeObj->prog["cameraWorldSpacePos"] = camera.getPosition();
-    modelObj->prog["lightPos"] = lightCubeObj->worldSpacePos;
+    planeObj->prog["lightPos"] = lightCubeObj->worldSpacePos;
     glBindVertexArray(planeObj->VAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);  
 
