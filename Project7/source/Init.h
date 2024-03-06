@@ -294,7 +294,7 @@ namespace Init {
         cameraPtr = camera;
          // initialize camera
         cameraPtr->setOrthographicMatrix(0.1f, 1500.0f, 500.0f);
-        cameraPtr->setPerspectiveMatrix(65,800.0f/600.0f, 0.1f, 1000.0f);
+        cameraPtr->setPerspectiveMatrix(65,800.0f/600.0f, 2.0f, 100.0f);
     }
 
     void initPlaneCamera(Camera * planeCamera) {

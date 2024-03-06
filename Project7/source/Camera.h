@@ -72,6 +72,14 @@ public:
         }
     }
 
+    void setPosition(cy::Vec3f &newPos) {
+        position = newPos;
+    }
+
+    void setFrontDirection(cy::Vec3f frontDir) {
+        front = frontDir;
+    }
+
     void setPerspectiveMatrix(float fov_degrees, float aspect, float znear, float zfar) {
         perspectiveMatrix = cy::Matrix4f::Perspective(Util::degreesToRadians(fov_degrees), aspect, znear, zfar);
 

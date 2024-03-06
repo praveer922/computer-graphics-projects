@@ -20,6 +20,7 @@ public:
     string vsFile;    // Vertex shader file path
     string fsFile;    // Fragment shader file path
     cy::GLSLProgram prog;
+    cy::GLSLProgram depthMapProg;
     GLuint VAO;
     
     cy::TriMesh mesh;
