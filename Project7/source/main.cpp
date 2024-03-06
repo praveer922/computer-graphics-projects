@@ -29,6 +29,7 @@ void display() {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     
     // render to depth map
+    glCullFace(GL_FRONT);
     // first update light camera 
     lightCamera.setPosition(lightCubeObj->worldSpacePos);
     lightCamera.setFrontDirection(-(lightCubeObj->worldSpacePos));
@@ -49,6 +50,7 @@ void display() {
     glDrawArrays(GL_TRIANGLES, 0, 6);  
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glCullFace(GL_BACK);
 
 
     // draw actual scene
@@ -61,8 +63,9 @@ void display() {
     modelObj->prog["projection"] = proj;
     modelObj->prog["cameraWorldSpacePos"] = camera.getPosition();
     modelObj->prog["lightPos"] = lightCubeObj->worldSpacePos;
+    modelObj->prog["lightSpaceMatrix"] = lightCamera.getProjectionMatrix() * lightCamera.getLookAtMatrix();
     glBindVertexArray(modelObj->VAO);
-    //glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
 
     // draw the light cube
     lightCubeObj->prog.Bind();
@@ -70,7 +73,7 @@ void display() {
     lightCubeObj->prog["view"] = view;
     lightCubeObj->prog["projection"] = proj;
     glBindVertexArray(lightCubeObj->VAO);
-    //glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // draw the plane
     planeObj->prog.Bind();
@@ -79,8 +82,9 @@ void display() {
     planeObj->prog["projection"] = proj;
     planeObj->prog["cameraWorldSpacePos"] = camera.getPosition();
     planeObj->prog["lightPos"] = lightCubeObj->worldSpacePos;
+    planeObj->prog["lightSpaceMatrix"] = lightCamera.getProjectionMatrix() * lightCamera.getLookAtMatrix();
     glBindVertexArray(planeObj->VAO);
-    //glDrawArrays(GL_TRIANGLES, 0, 6);  
+    glDrawArrays(GL_TRIANGLES, 0, 6);  
 
 
     // draw depth map debug screen
@@ -92,7 +96,7 @@ void display() {
     depthScreen->prog["cameraWorldSpacePos"] = camera.getPosition();
     depthScreen->prog["lightPos"] = lightCubeObj->worldSpacePos;
     glBindVertexArray(planeObj->VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6); 
+    //glDrawArrays(GL_TRIANGLES, 0, 6); 
 
     glutSwapBuffers();
 }
@@ -111,8 +115,8 @@ int main(int argc, char** argv) {
     // the teapot model is top down so let's rotate it 90 degrees
     modelObj->modelMatrix = cy::Matrix4f::RotationX(Util::degreesToRadians(-90)) * modelObj->modelMatrix;
     modelObj->prog["materialColor"] = cy::Vec3f(1.0f,0.5f,0.5f);
-    modelObj->prog["ambientStr"] = 0.1f;
-    modelObj->prog["diffuseStr"] = 0.2f;
+    modelObj->prog["ambientStr"] = 0.05f;
+    modelObj->prog["diffuseStr"] = 0.3f;
     modelObj->prog["specularStr"] = 0.8f;
     modelObj->prog["materialShininess"] = modelObj->mesh.M(0).Ns;
     modelObj->prog["lightColor"] = cy::Vec3f(1.0f,1.0f,1.0f);
@@ -139,8 +143,8 @@ int main(int argc, char** argv) {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 
     planeObj->prog["materialColor"] = cy::Vec3f(1.0f,1.0f,1.0f);
-    planeObj->prog["ambientStr"] = 0.1f;
-    planeObj->prog["diffuseStr"] = 0.2f;
+    planeObj->prog["ambientStr"] = 0.05f;
+    planeObj->prog["diffuseStr"] = 0.3f;
     planeObj->prog["specularStr"] = 0.8f;
     planeObj->prog["materialShininess"] = modelObj->mesh.M(0).Ns;
     planeObj->prog["lightColor"] = cy::Vec3f(1.0f,1.0f,1.0f);
@@ -155,8 +159,10 @@ int main(int argc, char** argv) {
                 800, 600, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);  
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);  
 
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMapTexture, 0);
