@@ -1,0 +1,48 @@
+#version 330 core
+out vec4 FragColor;
+
+in vec3 worldSpacePos;
+in vec2 TexCoords;
+
+uniform vec3 cameraWorldSpacePos;
+
+// Material Properties
+uniform float ambientStr;
+uniform float diffuseStr;
+uniform float specularStr;
+uniform float materialShininess;
+uniform vec3 materialColor;
+
+// Light properties
+uniform vec3 lightColor;
+uniform vec3 lightPos;
+
+uniform sampler2D normalMapTexture;
+
+
+// all of this is done in world space 
+
+void main()
+{    
+    vec3 normalPos = texture(normalMapTexture, TexCoords).rgb;
+    // blinn phong shading
+
+    // Ambient
+    vec3 ambient = materialColor * ambientStr;
+
+    // diffuse light 
+    vec3 normalizedNormal = normalize(normalPos);
+    vec3 lightDir = normalize(lightPos - worldSpacePos);
+    float diff = max(dot(normalizedNormal, lightDir), 0.0);
+    vec3 diffuse = materialColor * diff * diffuseStr;
+
+    // specular light (blinn-phong)
+    vec3 viewDir = normalize(cameraWorldSpacePos-worldSpacePos);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(normalizedNormal, halfwayDir), 0.0), materialShininess);
+    vec3 specular = materialColor * (spec * specularStr);
+
+
+    vec3 finalColor = (ambient + diffuse + specular) * lightColor; 
+    FragColor = vec4(finalColor,1);
+}
