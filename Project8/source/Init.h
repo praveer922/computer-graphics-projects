@@ -8,6 +8,7 @@
 using namespace std;
 
 extern bool isSpaceKeyPressed;
+extern float tessLevel;
 
 namespace Init {
     float lastX = 400, lastY = 300;
@@ -228,6 +229,14 @@ namespace Init {
             case GLUT_KEY_ALT_L:
             case GLUT_KEY_ALT_R:
                 altButtonPressed = true;
+                break;
+            case GLUT_KEY_LEFT:
+                tessLevel -= 2.0f;
+                glutPostRedisplay();
+                break;
+            case GLUT_KEY_RIGHT:
+                tessLevel += 2.0f;
+                glutPostRedisplay();
                 break;
         }
     }
